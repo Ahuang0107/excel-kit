@@ -1,6 +1,7 @@
-use crate::{Output, XmlWriter};
 use std::io::Write;
 use std::path::Path;
+
+use crate::{Output, XmlWriter};
 
 mod content_types;
 mod doc_props;
@@ -19,8 +20,8 @@ impl Excel {
         Self {
             rels: rels::Rels {},
             doc_props: doc_props::DocProps {
-                app: doc_props::App {},
-                core: doc_props::Core {},
+                app: doc_props::App::default(),
+                core: doc_props::Core::default(),
             },
             xl: xl::Xl {
                 workbook: xl::Workbook::new(),
@@ -30,7 +31,7 @@ impl Excel {
                 themes: vec![xl::Theme {}],
                 rels: xl::WorkbookRels {},
             },
-            content_types: content_types::ContentTypes {},
+            content_types: content_types::ContentTypes::default(),
         }
     }
     pub fn write<P: AsRef<Path>>(&self, path: P) -> Result<(), Box<dyn std::error::Error>> {
@@ -40,7 +41,7 @@ impl Excel {
             .compression_method(zip::CompressionMethod::Deflated)
             .unix_permissions(0o755);
         zip.start_file("[Content_Types].xml", options)?;
-        zip.write_all(self.content_types.to_xml().as_bytes())?;
+        zip.write_all(self.content_types.output().as_bytes())?;
 
         zip.add_directory("_rels", options)?;
         zip.add_directory("docProps", options)?;
@@ -53,9 +54,9 @@ impl Excel {
         zip.write_all(self.rels.to_xml().as_bytes())?;
 
         zip.start_file("docProps/app.xml", options)?;
-        zip.write_all(self.doc_props.app.to_xml().as_bytes())?;
+        zip.write_all(self.doc_props.app.output().as_bytes())?;
         zip.start_file("docProps/core.xml", options)?;
-        zip.write_all(self.doc_props.core.to_xml().as_bytes())?;
+        zip.write_all(self.doc_props.core.output().as_bytes())?;
 
         zip.start_file("xl/workbook.xml", options)?;
         zip.write_all(self.xl.workbook.output().as_bytes())?;
