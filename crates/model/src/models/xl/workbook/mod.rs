@@ -1,7 +1,7 @@
 mod sheet;
 
-#[serde(rename = "workbook")]
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[serde(rename = "workbook")]
 pub struct Workbook {
     #[serde(rename = "@xmlns")]
     pub xmlns: String,

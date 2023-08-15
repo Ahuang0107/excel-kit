@@ -10,8 +10,8 @@ use fill::*;
 use font::*;
 use xf::*;
 
-#[serde(rename = "styleSheet")]
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[serde(rename = "styleSheet")]
 pub struct Styles {
     #[serde(rename = "@xmlns")]
     pub xmlns: String,
