@@ -1,4 +1,4 @@
-use crate::Output;
+use crate::{Output, XmlWriter};
 use std::io::Write;
 use std::path::Path;
 
@@ -23,8 +23,8 @@ impl Excel {
                 core: doc_props::Core {},
             },
             xl: xl::Xl {
-                workbook: xl::Workbook {},
-                styles: xl::Styles {},
+                workbook: xl::Workbook::new(),
+                styles: xl::Styles::default(),
                 shared_strings: xl::SharedStrings {},
                 worksheets: vec![xl::Worksheet {}],
                 themes: vec![xl::Theme {}],
@@ -58,9 +58,9 @@ impl Excel {
         zip.write_all(self.doc_props.core.to_xml().as_bytes())?;
 
         zip.start_file("xl/workbook.xml", options)?;
-        zip.write_all(self.xl.workbook.to_xml().as_bytes())?;
+        zip.write_all(self.xl.workbook.output().as_bytes())?;
         zip.start_file("xl/styles.xml", options)?;
-        zip.write_all(self.xl.styles.to_xml().as_bytes())?;
+        zip.write_all(self.xl.styles.output().as_bytes())?;
         zip.start_file("xl/sharedStrings.xml", options)?;
         zip.write_all(self.xl.shared_strings.to_xml().as_bytes())?;
         for worksheet in self.xl.worksheets.iter() {
